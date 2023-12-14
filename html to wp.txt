@@ -1,0 +1,131 @@
+1.download the html file
+2.underscore wordpress .Please enter the project name
+3.extract the file and upload on the theme folder -> wp-content
+4.please remove the unused css from style.css
+5.please extract the html file
+6.please make a assets folder in theme and upload it to assets folder
+7. make a projectName_functions page
+8. please include a file in function.php
+9.then change links from index.html -> projectname_functions page
+10.please include the stylesheet and js in function file 
+11.please include the header html in header part php
+
+** make permalink in custom post type
+**make btn and url in acf
+** if there is slider and each of everyone has a separate page then make custom post type otherwise use acf
+**while using filter make custom post type
+**Please add Logo url wherever there is homepage link(index.html)
+<?php echo esc_url(home_url('/')); ?>
+**<?php echo get_post_meta($post->ID, 'text', true); ?> ----> while using text editor in acf, there comes a space,,,to avoid this use it.
+**<?php $content = get_the_content(); 
+                      echo wp_trim_words( get_the_content(), 10, '...' );?>
+                      <a href="<?php the_permalink() ?>">Read more </a>------> for word trim
+** get category name----->  <?php echo get_cat_name( $category_id = tag_id );?>
+** get category description------> <?php echo category_description(tag_id); ?>
+**privacy policy, return policy , terms & condition -> donot use acf
+** category description ----> <?php echo category_description(); ?>
+** for pagination use this----> <?php the_posts_pagination(); ?>
+** category image added by acf----->
+              $id = get_term_by('slug', categoryname, 'category'); 
+              $categories =  get_categories('child_of='.$id->term_id);
+              
+              foreach($categories as $category){
+                $category_name=$category->cat_name; /* echo the subCategory Name */
+                $cat_id= $category->term_id; 
+                <img src="<?php echo the_field('image', 'term_'. $cat_id); ?>" alt="">
+** *******
+      $catObj = get_category_by_slug('food'); 
+        $catName = $catObj->name;
+        $catDescription = $catObj->description;
+
+              $id = get_term_by('slug', $catName, 'category'); 
+              $categories =  get_categories('child_of='.$id->term_id);
+              foreach($categories as $category){
+                $category_name=$category->cat_name; /* echo the Category Name */
+                 $category_id = $category->cat_ID;    // echo the Category id 
+                 $category_link = get_category_link( $category_id );
+
+****  <a href="<?php echo esc_url( $category_link ); ?>">View more   -----> category archive page
+
+******************* <?php echo get_post_meta($post->top_content, 'text', true); ?>
+
+************* if there is any plugin css issues then we should replace the value with "unset"
+*************  to get any url dynamically use---- var site = '<?php echo site_url(); ?>';
+       ${site}/#bnnr   OR   site+#bnnr
+
+****************** wp_posts_pagiation() -----> is for archive or index page
+
+**********   pagination in custom php--
+  $paged = (get_query_var('paged')) ? get_query_var('paged') : 1;
+  'posts_per_page' => 10,
+  'paged'  => $paged
+<?php
+          $total_pages = $query->max_num_pages;
+          if ($total_pages > 1){
+          $current_page = max(1, get_query_var('paged'));
+          echo paginate_links(array(
+              'base' => get_pagenum_link(1) . '%_%',
+              'format' => '/page/%#%',
+              'current' => $current_page,
+              'total' => $total_pages,
+              'prev_text'    => __('« prev'),
+              'next_text'    => __('next »'),
+          ));  }
+?>
+
+**************  infinite scrolling using load more button  (inc/ajax.php , scroll.js , ajax_load.php)
+
+***********  CUSTOM POST TYPE NAME 
+        <?php
+        $post_type_obj = get_post_type_object( 'portfolio' );
+        ?>
+        <h2><?php echo $post_type_obj->labels->singular_name;  ?></h2>     
+ *****************
+
+add_action('wp_head','shorturl');
+function shorturl() {
+?>
+  <script type="text/javascript">
+   var siteurl = '<?php echo site_url(); ?>';
+
+
+
+  </script>
+<?php } ------------------> include site_url from js to php..................................
+
+
+
+**** **********************  stop showing website if user is not logged in ------
+
+add_action( 'template_redirect', 'check_if_user_logged_in');
+function check_if_user_logged_in(){
+    if( ! is_user_logged_in() )
+    {
+        wp_redirect( home_url( '/wp-login.php' ), 302 );
+        exit();
+    }
+}
+
+********************
+**************
+*********
+in navbar two menus are from home page and other one is another page ....to activate specific nav menu ----->
+	jQuery(document).ready(function($) {
+   	 function setActiveMenuItem() {
+        	let url = window.location.href;
+        	$('.navbar-nav a').removeClass('active');
+        	$('.navbar-nav a').each(function() {
+           	 if (this.href === url || (url.includes('#') && this.hash === window.location.hash)) {
+                	$(this).closest('a').addClass('active');
+            	}
+        	});
+    	}
+
+    	// Set active menu item on page load
+   	 setActiveMenuItem();
+
+    	// Set active menu item when hash changes
+    	$(window).on('hashchange', function() {
+       	 setActiveMenuItem();
+    	});
+	});
